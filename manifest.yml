@@ -6,5 +6,3 @@ applications:
   disk_quota: 1024MB
   command: gogo-service
   buildpack: https://github.com/cloudfoundry/go-buildpack.git
-  env:
-    GOPACKAGENAME: gogo-service

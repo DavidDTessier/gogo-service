@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"./service"
+	service "github.com/DuffMan2020/gogo-service/service"
 )
 
 func main() {

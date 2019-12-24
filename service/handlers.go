@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/cloudnativego/gogo-engine"
+	"github.com/gorilla/mux"
 	"github.com/unrolled/render"
 )
 
@@ -30,5 +31,36 @@ func createMatchHandler(formatter *render.Render, repo matchRepository) http.Han
 		mr.copyMatch(newMatch)
 		w.Header().Add("Location", "/matches/"+newMatch.ID)
 		formatter.JSON(w, http.StatusCreated, &mr)
+	}
+}
+
+func getMatchListHandler(formatter *render.Render, repo matchRepository) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		repoMatches, err := repo.getMatches()
+		if err == nil {
+			matches := make([]newMatchResponse, len(repoMatches))
+			for idx, match := range repoMatches {
+				matches[idx].copyMatch(match)
+			}
+			formatter.JSON(w, http.StatusOK, matches)
+		} else {
+			formatter.JSON(w, http.StatusNotFound, err.Error())
+		}
+
+	}
+}
+
+func getMatchDetailsHandler(formatter *render.Render, repo matchRepository) http.HandlerFunc {
+	return func(w http.ResponseWriter, req *http.Request) {
+		vars := mux.Vars(req)
+		matchID := vars["id"]
+		repoMatch, err := repo.getMatch(matchID)
+		if err != nil {
+			formatter.JSON(w, http.StatusNotFound, err.Error())
+		} else {
+			var mdr matchDetailsResponse
+			mdr.copyMatch(repoMatch)
+			formatter.JSON(w, http.StatusOK, &mdr)
+		}
 	}
 }

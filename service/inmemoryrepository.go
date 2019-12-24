@@ -1,6 +1,9 @@
 package service
 
 import (
+	"errors"
+	"strings"
+
 	"github.com/cloudnativego/gogo-engine"
 )
 
@@ -23,4 +26,18 @@ func (repo *inMemoryMatchRepository) addMatch(match gogo.Match) (err error) {
 func (repo *inMemoryMatchRepository) getMatches() (matches []gogo.Match, err error) {
 	matches = repo.matches
 	return
+}
+
+func (repo *inMemoryMatchRepository) getMatch(id string) (match gogo.Match, err error) {
+	found := false
+	for _, target := range repo.matches {
+		if strings.Compare(target.ID, id) == 0 {
+			match = target
+			found = true
+		}
+	}
+	if !found {
+		err = errors.New("Could not find match in repository")
+	}
+	return match, err
 }
